@@ -1,28 +1,48 @@
 import { type ReactNode } from "react";
 
-export function Table({ children }: { children: ReactNode }) {
+export function Table({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">{children}</table>
+    <div className={`overflow-hidden rounded-2xl border border-gray-200 bg-white ${className}`}>
+      <div className="w-full overflow-x-auto custom-scrollbar">
+        <table className="min-w-full">{children}</table>
+      </div>
     </div>
   );
 }
 
 export function THead({ children }: { children: ReactNode }) {
-  return <thead className="bg-gray-50">{children}</thead>;
+  return (
+    <thead>
+      <tr className="border-y border-gray-100">{children}</tr>
+    </thead>
+  );
 }
 
-export function TH({ children, className = "" }: { children?: ReactNode; className?: string }) {
+export function TH({
+  children,
+  className = "",
+}: {
+  children?: ReactNode;
+  className?: string;
+}) {
   return (
-    <th className={`px-6 py-3 text-left text-xs font-medium text-gray-500 ${className}`}>
+    <th
+      className={`px-5 py-3 text-left font-medium text-gray-500 text-theme-xs ${className}`}
+    >
       {children}
     </th>
   );
 }
 
-export function TD({ children, className = "" }: { children?: ReactNode; className?: string }) {
+export function TD({
+  children,
+  className = "",
+}: {
+  children?: ReactNode;
+  className?: string;
+}) {
   return (
-    <td className={`px-6 py-4 text-sm text-gray-900 ${className}`}>
+    <td className={`px-5 py-3.5 text-theme-sm text-gray-800 ${className}`}>
       {children}
     </td>
   );
@@ -40,7 +60,9 @@ export function TR({
   return (
     <tr
       onClick={onClick}
-      className={`border-b border-gray-100 hover:bg-gray-50 ${onClick ? "cursor-pointer" : ""} ${className}`}
+      className={`border-b border-gray-100 transition-colors hover:bg-gray-50 ${
+        onClick ? "cursor-pointer" : ""
+      } ${className}`}
     >
       {children}
     </tr>

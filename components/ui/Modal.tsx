@@ -26,20 +26,25 @@ export default function Modal({
 
   if (!open) return null;
 
-  const widths = { sm: "max-w-sm", md: "max-w-lg", lg: "max-w-2xl", xl: "max-w-4xl" };
+  const widths = {
+    sm: "max-w-sm",
+    md: "max-w-lg",
+    lg: "max-w-2xl",
+    xl: "max-w-4xl",
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-gray-950/40" onClick={onClose} />
       <div
-        className={`relative z-10 w-full ${widths[size]} rounded-card border border-gray-200 bg-white p-6 shadow-lg`}
+        className={`relative z-10 w-full ${widths[size]} rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xl`}
       >
         {title && (
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-card-title text-gray-900">{title}</h3>
+          <div className="mb-5 flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
             <button
               onClick={onClose}
-              className="rounded-lg p-1 text-gray-500 hover:bg-gray-50"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700"
             >
               <XMarkIcon className="h-5 w-5" />
             </button>

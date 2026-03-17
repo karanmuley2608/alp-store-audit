@@ -25,9 +25,9 @@ const icons: Record<ToastType, typeof CheckCircleIcon> = {
 };
 
 const styles: Record<ToastType, string> = {
-  success: "border-success-600 bg-success-50 text-success-600",
-  error: "border-error-600 bg-error-50 text-error-600",
-  warning: "border-warning-700 bg-warning-50 text-warning-700",
+  success: "border-success-500 bg-success-50 text-success-600",
+  error: "border-error-500 bg-error-50 text-error-600",
+  warning: "border-warning-500 bg-warning-50 text-warning-700",
   info: "border-brand-500 bg-brand-50 text-brand-500",
 };
 
@@ -57,17 +57,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast: addToast }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2">
+      <div className="fixed bottom-4 right-4 z-[99999] flex flex-col gap-2">
         {toasts.map((t) => {
           const Icon = icons[t.type];
           return (
             <div
               key={t.id}
-              className={`flex items-center gap-3 rounded-lg border px-4 py-3 shadow-lg ${styles[t.type]}`}
+              className={`flex items-start gap-3 rounded-xl border p-4 shadow-theme-lg ${styles[t.type]}`}
             >
-              <Icon className="h-5 w-5 shrink-0" />
-              <span className="text-sm font-medium">{t.message}</span>
-              <button onClick={() => removeToast(t.id)} className="ml-2">
+              <Icon className="mt-0.5 h-5 w-5 shrink-0" />
+              <span className="text-theme-sm font-medium">{t.message}</span>
+              <button onClick={() => removeToast(t.id)} className="ml-auto shrink-0">
                 <XMarkIcon className="h-4 w-4" />
               </button>
             </div>

@@ -34,7 +34,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Step 1: Lookup employee via server API — only returns email
       const lookupRes = await fetch("/api/auth/lookup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -48,19 +47,15 @@ export default function LoginPage() {
 
       const { email } = await lookupRes.json();
 
-      // Step 2: Sign in with email + password
       const supabase = createClient();
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({ email, password });
 
       if (authError || !authData.session) {
         setError("Invalid password");
         return;
       }
 
-      // Step 3: Fetch role, first_login, store_codes via server (pass access token)
       const meRes = await fetch("/api/auth/me", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -73,13 +68,11 @@ export default function LoginPage() {
 
       const employee = await meRes.json();
 
-      // Step 4: Check first login
       if (employee.first_login) {
         router.push("/change-password");
         return;
       }
 
-      // Step 5: SM with no stores assigned
       if (
         employee.role === "SM" &&
         (!employee.store_codes || employee.store_codes.length === 0)
@@ -88,7 +81,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Step 6: SM with multiple stores
       if (employee.role === "SM" && employee.store_codes?.length > 1) {
         setStoreCodes(employee.store_codes);
         setStoreSelector(true);
@@ -99,7 +91,6 @@ export default function LoginPage() {
         localStorage.setItem("selected_store_code", employee.store_codes[0]);
       }
 
-      // Step 7: Route by role
       router.push(ROLE_HOMES[employee.role] || "/readonly/dashboard");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -119,17 +110,21 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-[400px]">
+        {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500 shadow-theme-sm">
             <BuildingStorefrontIcon className="h-7 w-7 text-white" />
           </div>
-          <h1 className="text-page-title text-gray-900">ALP Store Audit</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-title-sm font-bold text-gray-800">
+            ALP Store Audit
+          </h1>
+          <p className="mt-1.5 text-theme-sm text-gray-500">
             Sign in to your account
           </p>
         </div>
 
-        <div className="rounded-card border border-gray-200 bg-white p-6">
+        {/* Card */}
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-sm">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {error && (
               <div className="flex justify-center">
@@ -169,7 +164,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => toast("info", "Contact your administrator")}
-              className="text-sm text-gray-500 hover:text-brand-500"
+              className="text-theme-sm text-gray-500 hover:text-brand-500"
             >
               Forgot password?
             </button>
@@ -182,7 +177,7 @@ export default function LoginPage() {
         onClose={() => setStoreSelector(false)}
         title="Select Store"
       >
-        <p className="mb-4 text-sm text-gray-500">
+        <p className="mb-4 text-theme-sm text-gray-500">
           You are assigned to multiple stores. Select one to continue.
         </p>
         <div className="flex flex-col gap-2">
@@ -190,7 +185,7 @@ export default function LoginPage() {
             <button
               key={code}
               onClick={() => selectStore(code)}
-              className="rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-900 hover:bg-gray-50"
+              className="rounded-lg border border-gray-200 px-4 py-3 text-left text-theme-sm font-medium text-gray-800 shadow-theme-xs hover:bg-gray-50"
             >
               {code}
             </button>
