@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: #1D2939;
+  background: #F9FAFB;
+  font-family: "Outfit", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F9FAFB;
+}
+::-webkit-scrollbar-thumb {
+  background: #E4E7EC;
+  border-radius: 3px;
+}
