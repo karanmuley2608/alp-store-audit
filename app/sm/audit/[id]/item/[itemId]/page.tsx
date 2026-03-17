@@ -60,7 +60,7 @@ export default function ItemDetailPage() {
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [showDates, setShowDates] = useState(false);
   const [inScope, setInScope] = useState(true);
-  const [damageCount, setDamageCount] = useState(0);
+  const [damageCount, setDamageCount] = useState<number | null>(null);
   const [satisfaction, setSatisfaction] = useState<string | null>(null);
   const [remarks, setRemarks] = useState("");
   const [plannedStart, setPlannedStart] = useState("");
@@ -68,6 +68,8 @@ export default function ItemDetailPage() {
   const [taskStart, setTaskStart] = useState("");
   const [taskEnd, setTaskEnd] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLInputElement>(null);
   const autoSaveRef = useRef<NodeJS.Timeout>();
   const initializedRef = useRef(false);
   const router = useRouter();
@@ -86,7 +88,7 @@ export default function ItemDetailPage() {
         const d = data as unknown as AuditItemData;
         setItem(d);
         setInScope(d.in_scope);
-        setDamageCount(d.damage_count || 0);
+        setDamageCount(d.damage_count);
         setSatisfaction(d.satisfaction_status);
         setRemarks(d.sm_remarks || "");
         setPlannedStart(d.planned_start_date || "");
@@ -225,17 +227,26 @@ export default function ItemDetailPage() {
 
   return (
     <div className="space-y-4 p-4">
-      {/* Top bar */}
+      {/* Breadcrumb + auto-save status */}
       <div className="flex items-center justify-between">
-        <button onClick={() => router.push(`/sm/audit/${id}/checklist`)} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900">
-          <ArrowLeftIcon className="h-4 w-4" /> Checklist
-        </button>
-        <span className="text-xs text-gray-400">
+        <nav className="flex items-center gap-1 text-theme-xs text-gray-500">
+          <button onClick={() => router.push("/sm/home")} className="hover:text-brand-500">Home</button>
+          <span>/</span>
+          <button onClick={() => router.push(`/sm/audit/${id}/checklist`)} className="hover:text-brand-500">Checklist</button>
+          <span>/</span>
+          <span className="font-medium text-gray-800">Item #{ci.sr_no}</span>
+        </nav>
+        <span className="text-theme-xs text-gray-400">
           {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved ✓" : ""}
         </span>
       </div>
 
-      <h1 className="text-base font-semibold text-gray-900">
+      {/* Back link */}
+      <button onClick={() => router.push(`/sm/audit/${id}/checklist`)} className="flex items-center gap-1.5 text-theme-sm text-gray-500 hover:text-gray-800">
+        <ArrowLeftIcon className="h-4 w-4" /> Back to checklist
+      </button>
+
+      <h1 className="text-lg font-semibold text-gray-800">
         #{ci.sr_no} · {ci.work_type} · {ci.activity}
       </h1>
 
@@ -258,13 +269,14 @@ export default function ItemDetailPage() {
         </div>
         {inScope && (
           <div className="mt-3">
-            <label className="text-sm text-gray-500">Damage count</label>
+            <label className="mb-1 block text-theme-sm font-medium text-gray-700">Damage count</label>
             <input
               type="number"
               min={0}
-              value={damageCount}
-              onChange={(e) => setDamageCount(parseInt(e.target.value) || 0)}
-              className="mt-1 h-11 w-full rounded-lg border border-gray-200 px-3 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              value={damageCount ?? ""}
+              placeholder="e.g. 2"
+              onChange={(e) => setDamageCount(e.target.value === "" ? null : parseInt(e.target.value) || 0)}
+              className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-theme-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10"
             />
           </div>
         )}
@@ -348,18 +360,52 @@ export default function ItemDetailPage() {
               </div>
             )}
 
-            <button
-              onClick={() => fileRef.current?.click()}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-6 text-sm text-gray-500 hover:border-brand-500 hover:text-brand-500"
-            >
-              <CameraIcon className="h-5 w-5" />
-              Tap to photograph or record video
-            </button>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => cameraRef.current?.click()}
+                className="flex flex-col items-center gap-1.5 rounded-lg border-2 border-dashed border-gray-300 px-2 py-4 text-theme-xs text-gray-500 hover:border-brand-500 hover:text-brand-500 transition-colors"
+              >
+                <CameraIcon className="h-6 w-6" />
+                Take photo
+              </button>
+              <button
+                onClick={() => videoRef.current?.click()}
+                className="flex flex-col items-center gap-1.5 rounded-lg border-2 border-dashed border-gray-300 px-2 py-4 text-theme-xs text-gray-500 hover:border-brand-500 hover:text-brand-500 transition-colors"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                Record video
+              </button>
+              <button
+                onClick={() => fileRef.current?.click()}
+                className="flex flex-col items-center gap-1.5 rounded-lg border-2 border-dashed border-gray-300 px-2 py-4 text-theme-xs text-gray-500 hover:border-brand-500 hover:text-brand-500 transition-colors"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" /></svg>
+                Gallery
+              </button>
+            </div>
+            {/* Camera — opens rear camera for photo */}
+            <input
+              ref={cameraRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => handleFileUpload(e.target.files)}
+            />
+            {/* Video — opens camera for video recording */}
+            <input
+              ref={videoRef}
+              type="file"
+              accept="video/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => handleFileUpload(e.target.files)}
+            />
+            {/* Gallery — no capture attr, opens OS file picker / gallery */}
             <input
               ref={fileRef}
               type="file"
               accept="image/*,video/*"
-              capture="environment"
               multiple
               className="hidden"
               onChange={(e) => handleFileUpload(e.target.files)}
