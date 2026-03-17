@@ -101,9 +101,10 @@ export default function LoginPage() {
 
       // Step 7: Route by role
       router.push(ROLE_HOMES[employee.role] || "/readonly/dashboard");
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Something went wrong. Please try again.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Login error:", msg);
+      setError("Error: " + msg);
     } finally {
       setLoading(false);
     }
