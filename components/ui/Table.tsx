@@ -12,8 +12,8 @@ export function Table({ children, className = "" }: { children: ReactNode; class
 
 export function THead({ children }: { children: ReactNode }) {
   return (
-    <thead>
-      <tr className="border-y border-gray-100">{children}</tr>
+    <thead className="border-b border-gray-100">
+      {children}
     </thead>
   );
 }

@@ -99,8 +99,7 @@ export default function StateProgressPage() {
           <Button variant="secondary" onClick={exportCSV}>Export to CSV</Button>
         </div>
 
-        <Card className="!p-0 overflow-hidden">
-          <Table>
+        <Table>
             <THead>
               <tr>
                 <TH>State</TH>
@@ -139,7 +138,6 @@ export default function StateProgressPage() {
               })}
             </tbody>
           </Table>
-        </Card>
 
         {/* Zero activity warnings */}
         {rows.filter((r) => r.completed === 0 && r.totalItems > 0).map((r) => (

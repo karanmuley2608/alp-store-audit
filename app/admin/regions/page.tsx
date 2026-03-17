@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -64,8 +63,7 @@ export default function AdminRegionsPage() {
         <h1 className="text-page-title text-gray-900">Regions</h1>
         <Button onClick={() => { setEditing(null); setForm({ region_code: "", region_name: "", business_states: "" }); setShowModal(true); }}>Add region</Button>
       </div>
-      <Card className="!p-0 overflow-hidden">
-        <Table>
+      <Table>
           <THead><tr><TH>Code</TH><TH>Name</TH><TH>States</TH><TH>Status</TH><TH>Actions</TH></tr></THead>
           <tbody>
             {regions.map((r) => (
@@ -84,7 +82,6 @@ export default function AdminRegionsPage() {
             ))}
           </tbody>
         </Table>
-      </Card>
       <Modal open={showModal} onClose={() => setShowModal(false)} title={editing ? "Edit Region" : "Add Region"}>
         <div className="space-y-4">
           <Input label="Region Code" value={form.region_code} onChange={(e) => setForm({ ...form, region_code: e.target.value })} />

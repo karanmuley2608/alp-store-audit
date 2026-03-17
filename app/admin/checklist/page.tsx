@@ -2,7 +2,6 @@
 
 import { Fragment, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Spinner from "@/components/ui/Spinner";
@@ -64,8 +63,7 @@ export default function AdminChecklistPage() {
         <Button onClick={() => toast("info", "Feature coming soon")}>Add item</Button>
       </div>
 
-      <Card className="!p-0 overflow-hidden">
-        <Table>
+      <Table>
           <THead>
             <tr>
               <TH>#</TH><TH>Work Type</TH><TH>Activity</TH><TH>Category</TH><TH>Scope</TH><TH>Status</TH><TH></TH>
@@ -120,7 +118,6 @@ export default function AdminChecklistPage() {
             ))}
           </tbody>
         </Table>
-      </Card>
     </div>
   );
 }

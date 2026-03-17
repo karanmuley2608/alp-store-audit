@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useEmployee } from "@/lib/hooks/useEmployee";
 import NSOTopbar from "@/components/layout/NSOTopbar";
-import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
 import RAGIndicator from "@/components/ui/RAGIndicator";
@@ -13,6 +12,8 @@ import Tabs from "@/components/ui/Tabs";
 import Spinner from "@/components/ui/Spinner";
 import { Table, THead, TH, TD, TR } from "@/components/ui/Table";
 import { getRAGStatus, getDaysRemaining } from "@/lib/utils/rag";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+
 interface StoreRow {
   id: string;
   store_code: string;
@@ -120,38 +121,44 @@ export default function NSOStoresPage() {
   return (
     <div className="flex flex-col">
       <NSOTopbar title="All Stores" />
-      <div className="p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <input
-            type="text"
-            placeholder="Search stores..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="h-11 w-80 rounded-lg border border-gray-200 px-4 text-sm placeholder:text-gray-400 focus:border-brand-500 focus:outline-none"
+      <div className="mx-auto w-full max-w-[--breakpoint-2xl] p-4 md:p-6">
+        <div className="space-y-5">
+          {/* Filters row */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search stores..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent pl-10 pr-4 text-theme-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 sm:w-80"
+              />
+            </div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="h-11 appearance-none rounded-lg border border-gray-300 bg-white px-4 pr-10 text-theme-sm text-gray-700 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10"
+            >
+              <option value="deadline">Sort by deadline</option>
+              <option value="completion">Sort by completion %</option>
+            </select>
+          </div>
+
+          {/* Tabs */}
+          <Tabs
+            tabs={[
+              { label: "All", value: "all", count: stores.length },
+              { label: "Needs review", value: "needs_review" },
+              { label: "In progress", value: "in_progress" },
+              { label: "Approved", value: "approved" },
+              { label: "Overdue", value: "overdue" },
+            ]}
+            active={tab}
+            onChange={setTab}
           />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="h-11 rounded-lg border border-gray-200 px-3 text-sm text-gray-700"
-          >
-            <option value="deadline">Sort by deadline</option>
-            <option value="completion">Sort by completion %</option>
-          </select>
-        </div>
 
-        <Tabs
-          tabs={[
-            { label: "All", value: "all", count: stores.length },
-            { label: "Needs review", value: "needs_review" },
-            { label: "In progress", value: "in_progress" },
-            { label: "Approved", value: "approved" },
-            { label: "Overdue", value: "overdue" },
-          ]}
-          active={tab}
-          onChange={setTab}
-        />
-
-        <Card className="!p-0 overflow-hidden">
+          {/* Table */}
           <Table>
             <THead>
               <tr>
@@ -164,38 +171,70 @@ export default function NSOStoresPage() {
                 <TH>Action</TH>
               </tr>
             </THead>
-            <tbody>
+            <tbody className="divide-y divide-gray-100">
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-5 py-10 text-center text-theme-sm text-gray-500">
+                    No stores found.
+                  </td>
+                </tr>
+              )}
               {filtered.map((s) => {
                 const pct = s.total > 0 ? Math.round((s.progress / s.total) * 100) : 0;
+                const days = s.target_completion_date ? getDaysRemaining(new Date(s.target_completion_date)) : null;
                 return (
                   <TR key={s.id} onClick={() => router.push(`/nso/store/${s.id}`)}>
-                    <TD className="font-mono font-medium">{s.store_code}</TD>
+                    <TD className="font-mono font-medium text-gray-800">{s.store_code}</TD>
                     <TD>
-                      <p className="font-medium">{s.store_name}</p>
-                      <p className="text-xs text-gray-500">{s.city}, {s.state}</p>
+                      <p className="font-medium text-gray-800">{s.store_name}</p>
+                      <p className="text-theme-xs text-gray-500">{s.city}, {s.state}</p>
                     </TD>
                     <TD><Badge variant="neutral">{s.store_type}</Badge></TD>
                     <TD><Badge variant={statusMap[s.audit_status] || "neutral"}>{s.audit_status.replace(/_/g, " ")}</Badge></TD>
                     <TD>
-                      <div className="flex items-center gap-2">
-                        <ProgressBar value={pct} className="w-20" color="bg-success-600" />
-                        <span className="text-xs">{pct}%</span>
+                      <div className="flex items-center gap-2.5 min-w-[120px]">
+                        <RAGIndicator status={pct >= 80 ? "green" : pct >= 40 ? "amber" : "red"} />
+                        <ProgressBar value={pct} className="w-24" color={pct >= 80 ? "bg-success-500" : pct >= 40 ? "bg-warning-500" : "bg-error-500"} />
+                        <span className="text-theme-xs font-medium text-gray-700 tabular-nums">{pct}%</span>
                       </div>
                     </TD>
                     <TD>
-                      {s.target_completion_date && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs">{getDaysRemaining(new Date(s.target_completion_date))}d</span>
+                      {days !== null && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-theme-xs tabular-nums text-gray-700">{days}d</span>
                           <RAGIndicator status={getRAGStatus(new Date(s.target_completion_date), pct)} />
                         </div>
                       )}
                     </TD>
                     <TD>
                       {(s.audit_status === "submitted" || s.audit_status === "resubmitted") && (
-                        <button className="rounded-md bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-700">Review</button>
+                        <button
+                          onClick={() => router.push(`/nso/store/${s.id}/approve`)}
+                          className="rounded-lg bg-warning-50 px-3 py-1.5 text-theme-xs font-medium text-warning-700 hover:bg-warning-100 transition-colors"
+                        >
+                          Review
+                        </button>
+                      )}
+                      {s.audit_status === "in_progress" && (
+                        <button
+                          onClick={() => router.push(`/nso/store/${s.id}`)}
+                          className="rounded-lg bg-brand-50 px-3 py-1.5 text-theme-xs font-medium text-brand-500 hover:bg-brand-100 transition-colors"
+                        >
+                          View
+                        </button>
                       )}
                       {s.audit_status === "approved" && (
-                        <button className="rounded-md bg-success-50 px-2.5 py-1 text-xs font-medium text-success-600">Report</button>
+                        <button
+                          onClick={() => {
+                            const supabase = createClient();
+                            supabase.from("audits").select("id").eq("store_id", s.id).eq("status", "approved").limit(1).then(({ data }) => {
+                              if (data?.[0]) router.push(`/report/${data[0].id}`);
+                            });
+                          }}
+                          className="rounded-lg bg-success-50 px-3 py-1.5 text-theme-xs font-medium text-success-600 hover:bg-success-100 transition-colors"
+                        >
+                          Report
+                        </button>
                       )}
                     </TD>
                   </TR>
@@ -203,7 +242,7 @@ export default function NSOStoresPage() {
               })}
             </tbody>
           </Table>
-        </Card>
+        </div>
       </div>
     </div>
   );

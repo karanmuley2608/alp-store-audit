@@ -162,8 +162,7 @@ export default function ReportPage() {
       )}
 
       {/* Items table */}
-      <Card className="!p-0 overflow-hidden">
-        <Table>
+      <Table>
           <THead>
             <tr>
               <TH>#</TH><TH>Work Type</TH><TH>Activity</TH><TH>Scope</TH><TH>Satisfaction</TH><TH>Planned</TH><TH>Actual</TH><TH>Evidence</TH><TH>SM Remarks</TH>
@@ -191,7 +190,6 @@ export default function ReportPage() {
             ))}
           </tbody>
         </Table>
-      </Card>
 
       {/* Footer */}
       <div className="text-center text-xs text-gray-400">

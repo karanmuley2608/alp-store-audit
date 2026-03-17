@@ -171,8 +171,7 @@ export default function StoreDetailPage() {
         />
 
         {/* Items table */}
-        <Card className="!p-0 overflow-hidden">
-          <Table>
+        <Table>
             <THead>
               <tr>
                 <TH>#</TH>
@@ -219,7 +218,6 @@ export default function StoreDetailPage() {
               })}
             </tbody>
           </Table>
-        </Card>
 
         {/* Actions */}
         {(store.audit_status === "submitted" || store.audit_status === "resubmitted") && (

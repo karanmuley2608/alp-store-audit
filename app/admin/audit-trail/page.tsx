@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Spinner from "@/components/ui/Spinner";
 import { Table, THead, TH, TD, TR } from "@/components/ui/Table";
@@ -83,8 +82,7 @@ export default function AuditTrailPage() {
           {entityTypes.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
-      <Card className="!p-0 overflow-hidden">
-        <Table>
+      <Table>
           <THead><tr><TH>Timestamp</TH><TH>Employee</TH><TH>Action</TH><TH>Entity</TH><TH>Field</TH><TH>Old</TH><TH>New</TH></tr></THead>
           <tbody>
             {entries.map((e) => {
@@ -103,7 +101,6 @@ export default function AuditTrailPage() {
             })}
           </tbody>
         </Table>
-      </Card>
       <div className="flex justify-between">
         <Button variant="secondary" disabled={page === 0} onClick={() => setPage(page - 1)}>Previous</Button>
         <span className="text-sm text-gray-500">Page {page + 1}</span>

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -131,8 +130,7 @@ export default function AdminEmployeesPage() {
         className="h-11 w-80 rounded-lg border border-gray-200 px-4 text-sm placeholder:text-gray-400 focus:border-brand-500 focus:outline-none"
       />
 
-      <Card className="!p-0 overflow-hidden">
-        <Table>
+      <Table>
           <THead>
             <tr>
               <TH>Code</TH>
@@ -172,7 +170,6 @@ export default function AdminEmployeesPage() {
             ))}
           </tbody>
         </Table>
-      </Card>
 
       <Modal open={showModal} onClose={() => setShowModal(false)} title={editing ? "Edit Employee" : "Add Employee"} size="lg">
         <div className="grid grid-cols-2 gap-4">
