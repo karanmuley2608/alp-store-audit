@@ -9,7 +9,7 @@ Never edit manually — the agent owns this file.
 
 | Date | Branch | Scope | Generated | Passed | Failed | Critical | High | Bug IDs | QA_AGENT updated |
 |------|--------|-------|-----------|--------|--------|----------|------|---------|-----------------|
-| — | — | — | — | — | — | — | — | — | — |
+| 2026-03-18 | main | SM item detail (damage count, evidence upload, breadcrumbs) | 7 | 7 | 0 | 0 | 0 | — | No |
 
 ---
 
