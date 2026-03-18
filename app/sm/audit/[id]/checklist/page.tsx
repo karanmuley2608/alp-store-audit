@@ -24,24 +24,6 @@ interface AuditItem {
   };
 }
 
-// Light background tint per category for row coloring
-const categoryRowBg: Record<string, string> = {
-  MEP: "bg-brand-25",           // very light blue
-  Interior: "bg-gray-25",       // very light gray
-  "Wet areas": "bg-warning-25", // very light amber
-  "Façade": "bg-success-25",    // very light green
-  Fixtures: "bg-error-25",      // very light red
-};
-
-// Section header bg per category
-const categorySectionBg: Record<string, string> = {
-  MEP: "bg-brand-50 text-brand-600 border-brand-200",
-  Interior: "bg-gray-100 text-gray-700 border-gray-200",
-  "Wet areas": "bg-warning-50 text-warning-700 border-warning-300",
-  "Façade": "bg-success-50 text-success-700 border-success-300",
-  Fixtures: "bg-error-50 text-error-700 border-error-300",
-};
-
 // Canonical ordering
 const categoryOrder = ["MEP", "Interior", "Wet areas", "Façade", "Fixtures"];
 
@@ -116,6 +98,17 @@ export default function ChecklistPage() {
   const catCounts: Record<string, number> = {};
   for (const cat of categoryOrder) {
     catCounts[cat] = items.filter((i) => i.checklist_items?.category === cat).length;
+  }
+
+  // Build sequential numbering (1-23) across all items in category order
+  const seqMap = new Map<string, number>();
+  let seq = 0;
+  for (const cat of categoryOrder) {
+    const catItems = items.filter((i) => i.checklist_items?.category === cat);
+    for (const ci of catItems) {
+      seq++;
+      seqMap.set(ci.id, seq);
+    }
   }
 
   return (
@@ -196,12 +189,9 @@ export default function ChecklistPage() {
         {grouped.map((group) => (
           <div key={group.category}>
             {/* Category section header */}
-            <div className={`mb-2 flex items-center justify-between rounded-lg border px-3 py-2 ${categorySectionBg[group.category] || "bg-gray-100 text-gray-700 border-gray-200"}`}>
-              <span className="text-theme-xs font-semibold uppercase tracking-wider">
+            <div className="mb-2 flex items-center rounded-lg border border-gray-200 bg-gray-100 px-3 py-2">
+              <span className="text-theme-xs font-semibold uppercase tracking-wider text-gray-700">
                 {group.category}
-              </span>
-              <span className="text-theme-xs font-medium opacity-70">
-                {group.items.filter((i) => i.status === "completed" || i.status === "out_of_scope").length}/{group.items.length} done
               </span>
             </div>
 
@@ -215,8 +205,6 @@ export default function ChecklistPage() {
                   item.status === "out_of_scope" ? "neutral" :
                   item.status === "in_progress" ? "info" : "warning";
 
-                const rowBg = categoryRowBg[ci?.category] || "";
-
                 return (
                   <div
                     key={item.id}
@@ -226,12 +214,12 @@ export default function ChecklistPage() {
                         ? "border-l-4 border-l-brand-500 border-brand-200 bg-brand-50"
                         : item.status === "out_of_scope"
                           ? "border-gray-100 bg-gray-50 opacity-60"
-                          : `border-gray-200 ${rowBg}`
+                          : "border-gray-200"
                     }`}
                   >
-                    {/* Sr No */}
+                    {/* Sequential number */}
                     <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-theme-xs font-mono font-semibold text-gray-700 shadow-theme-xs">
-                      {ci?.sr_no}
+                      {seqMap.get(item.id) ?? ci?.sr_no}
                     </span>
 
                     {/* Content */}
